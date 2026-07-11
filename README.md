@@ -31,7 +31,7 @@ No installation or build tools required.
 ```bash
 git clone https://github.com/binduhasini11/Cosmic-Match.git
 cd Cosmic-Match
-open cosmic-memory-match.html
+open index.html
 ```
 
 You can also serve it locally if you prefer:
@@ -40,7 +40,7 @@ You can also serve it locally if you prefer:
 npx serve .
 ```
 
-Or drag `cosmic-memory-match.html` straight into any browser tab.
+Or drag `index.html` straight into any browser tab.
 
 ## 🛠️ Tech stack
 
@@ -50,13 +50,6 @@ Or drag `cosmic-memory-match.html` straight into any browser tab.
 - **Web Audio API** for all sound effects (synthesized in-browser, no audio assets)
 
 Everything lives in a single self-contained file — easy to drop into any static site or GitHub Pages.
-
-## 📦 Deploying with GitHub Pages
-
-1. Push this repo to GitHub.
-2. Go to **Settings → Pages**.
-3. Set the source branch to `main` (or `master`) and root folder.
-4. Rename `cosmic-memory-match.html` to `index.html` if you want it to load at the root URL, or link to it directly.
 
 ## 📄 License
 
