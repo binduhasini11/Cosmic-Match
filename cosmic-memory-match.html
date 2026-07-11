@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic Match — Memory Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#170B36;
+    --bg-2:#2A1458;
+    --card-back-a:#6C4CE0;
+    --card-back-b:#2EE6D6;
+    --card-face:#FFF6E9;
+    --ink:#241638;
+    --pink:#FF3D77;
+    --yellow:#FFD23F;
+    --teal:#2EE6D6;
+    --cream:#FFF8F0;
+    --panel: rgba(255,255,255,0.06);
+    --panel-border: rgba(255,255,255,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Nunito',sans-serif;
+    color:var(--cream);
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(108,76,224,0.35), transparent 55%),
+      radial-gradient(ellipse at 85% 85%, rgba(46,230,214,0.18), transparent 50%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* twinkling starfield */
+  #stars{position:fixed; inset:0; z-index:0; pointer-events:none;}
+  .star{
+    position:absolute; background:#fff; border-radius:50%;
+    animation:twinkle 3s ease-in-out infinite;
+    opacity:0.4;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.15; transform:scale(1);}
+    50%{opacity:0.9; transform:scale(1.4);}
+  }
+
+  .wrap{
+    position:relative; z-index:1;
+    max-width:920px; margin:0 auto;
+    padding:28px 16px 60px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+
+  /* Header */
+  .title-row{ display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+  .mascot{
+    font-size:44px;
+    display:inline-block;
+    animation:bob 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  }
+  @keyframes bob{
+    0%,100%{transform:translateY(0) rotate(-4deg);}
+    50%{transform:translateY(-8px) rotate(4deg);}
+  }
+  h1{
+    font-family:'Fredoka',sans-serif;
+    font-weight:700;
+    font-size:clamp(28px,5vw,42px);
+    margin:0;
+    background:linear-gradient(90deg, var(--teal), var(--yellow) 55%, var(--pink));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:0.5px;
+  }
+  .subtitle{
+    font-size:14px; opacity:0.75; margin:2px 0 22px; text-align:center; max-width:480px;
+    font-weight:700; letter-spacing:0.3px;
+  }
+
+  /* Stats bar */
+  .stats-bar{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    margin-bottom:18px;
+  }
+  .stat-pill{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:999px;
+    padding:8px 18px;
+    display:flex; align-items:center; gap:8px;
+    font-family:'Fredoka',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    backdrop-filter:blur(6px);
+  }
+  .stat-pill .val{
+    font-family:'Nunito',sans-serif;
+    font-weight:900;
+    color:var(--yellow);
+    min-width:2ch;
+    text-align:right;
+  }
+  .stat-pill.score .val{color:var(--pink);}
+  .stat-pill.timer .val{color:var(--teal);}
+
+  /* Controls */
+  .controls-row{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center;
+    margin-bottom:22px;
+  }
+  .diff-group{
+    display:flex; gap:6px; background:var(--panel); border:1px solid var(--panel-border);
+    padding:5px; border-radius:999px;
+  }
+  .diff-btn{
+    border:none; cursor:pointer; padding:8px 16px; border-radius:999px;
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px;
+    background:transparent; color:var(--cream); opacity:0.7;
+    transition:all 0.2s ease;
+  }
+  .diff-btn:hover{opacity:1;}
+  .diff-btn.active{
+    background:linear-gradient(90deg,var(--pink),var(--teal));
+    color:#1a0e33; opacity:1;
+    box-shadow:0 3px 12px rgba(255,61,119,0.35);
+  }
+  .icon-btn{
+    border:none; cursor:pointer; width:38px; height:38px; border-radius:50%;
+    background:var(--panel); border:1px solid var(--panel-border);
+    color:var(--cream); font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.15s ease, background 0.2s ease;
+  }
+  .icon-btn:hover{transform:scale(1.08); background:rgba(255,255,255,0.14);}
+  .icon-btn:active{transform:scale(0.94);}
+  .new-game-btn{
+    border:none; cursor:pointer; padding:9px 20px; border-radius:999px;
+    font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px;
+    background:linear-gradient(90deg, var(--yellow), var(--pink));
+    color:#2b1440;
+    box-shadow:0 3px 12px rgba(255,210,63,0.3);
+    transition:transform 0.15s ease;
+  }
+  .new-game-btn:hover{transform:translateY(-2px);}
+  .new-game-btn:active{transform:translateY(0);}
+
+  /* Board */
+  .board{
+    display:grid;
+    gap:12px;
+    perspective:1000px;
+    width:100%;
+    max-width:640px;
+  }
+  .board.easy{grid-template-columns:repeat(4,1fr);}
+  .board.medium{grid-template-columns:repeat(4,1fr);}
+  .board.hard{grid-template-columns:repeat(6,1fr);}
+
+  .card{
+    aspect-ratio:1/1;
+    cursor:pointer;
+    position:relative;
+    animation:pop-in 0.45s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  @keyframes pop-in{
+    0%{transform:scale(0) rotate(-15deg); opacity:0;}
+    100%{transform:scale(1) rotate(0); opacity:1;}
+  }
+
+  .card-inner{
+    width:100%; height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform 0.55s cubic-bezier(.4,.2,.2,1);
+    border-radius:14px;
+  }
+  .card.flipped .card-inner{transform:rotateY(180deg);}
+  .card.matched .card-inner{
+    animation:matched-pulse 0.7s ease;
+  }
+  @keyframes matched-pulse{
+    0%{transform:rotateY(180deg) scale(1);}
+    40%{transform:rotateY(180deg) scale(1.18);}
+    100%{transform:rotateY(180deg) scale(1);}
+  }
+  .card.shake .card-inner{ animation:shake-flip 0.5s ease; }
+  @keyframes shake-flip{
+    0%,100%{transform:rotateY(0) translateX(0);}
+    20%{transform:rotateY(0) translateX(-6px);}
+    40%{transform:rotateY(0) translateX(6px);}
+    60%{transform:rotateY(0) translateX(-4px);}
+    80%{transform:rotateY(0) translateX(4px);}
+  }
+
+  .card-face{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:14px;
+    backface-visibility:hidden;
+    font-size:clamp(24px,6vw,38px);
+  }
+  .card-back{
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 55%),
+      linear-gradient(135deg, var(--card-back-a), var(--card-back-b));
+    box-shadow:0 4px 10px rgba(0,0,0,0.35), inset 0 0 0 2px rgba(255,255,255,0.15);
+  }
+  .card-back::after{
+    content:'✦';
+    color:rgba(255,255,255,0.85);
+    font-size:1.4em;
+    text-shadow:0 0 8px rgba(255,255,255,0.6);
+  }
+  .card-front{
+    background:linear-gradient(160deg, var(--card-face), #FFE9CE);
+    transform:rotateY(180deg);
+    color:var(--ink);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.25);
+  }
+  .card.matched .card-front{
+    background:linear-gradient(160deg,#D8FFF3,#B9FCEA);
+    box-shadow:inset 0 0 0 3px var(--teal), 0 0 18px rgba(46,230,214,0.55);
+  }
+  .card:not(.flipped):not(.matched):hover .card-inner{
+    transform:translateY(-4px) scale(1.03);
+  }
+  .card.locked{pointer-events:none;}
+
+  /* Win modal */
+  .overlay{
+    position:fixed; inset:0; z-index:20;
+    background:rgba(10,4,28,0.72);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity 0.3s ease;
+  }
+  .overlay.show{opacity:1; pointer-events:all;}
+  .win-panel{
+    background:linear-gradient(160deg,#2A1458,#170B36);
+    border:1px solid var(--panel-border);
+    border-radius:22px;
+    padding:36px 32px;
+    text-align:center;
+    max-width:380px;
+    width:90%;
+    transform:scale(0.8) translateY(20px);
+    transition:transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .overlay.show .win-panel{transform:scale(1) translateY(0);}
+  .win-emoji{font-size:56px; animation:bob 1.6s ease-in-out infinite;}
+  .win-panel h2{
+    font-family:'Fredoka',sans-serif; font-size:26px; margin:8px 0 4px;
+    background:linear-gradient(90deg,var(--yellow),var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .win-stats{display:flex; justify-content:center; gap:18px; margin:18px 0;}
+  .win-stat{font-family:'Fredoka',sans-serif;}
+  .win-stat .n{display:block; font-size:22px; font-weight:700; color:var(--teal);}
+  .win-stat .l{font-size:11px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px;}
+  .stars{font-size:30px; margin:6px 0 4px; letter-spacing:4px;}
+
+  canvas#confetti{position:fixed; inset:0; z-index:25; pointer-events:none;}
+
+  footer{
+    margin-top:26px; font-size:12px; opacity:0.5; text-align:center;
+  }
+
+  @media (max-width:480px){
+    .board{gap:8px;}
+    .card-face{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+  <div class="title-row">
+    <span class="mascot" id="mascot">🌟</span>
+    <h1>Cosmic Match</h1>
+  </div>
+  <p class="subtitle">Flip the cards, find the pairs, light up the galaxy!</p>
+
+  <div class="stats-bar">
+    <div class="stat-pill score">🏆 <span class="val" id="scoreVal">0</span></div>
+    <div class="stat-pill timer">⏱️ <span class="val" id="timerVal">00:00</span></div>
+    <div class="stat-pill">👣 <span class="val" id="movesVal">0</span></div>
+    <div class="stat-pill">💫 <span class="val" id="pairsVal">0/6</span></div>
+  </div>
+
+  <div class="controls-row">
+    <div class="diff-group" id="diffGroup">
+      <button class="diff-btn active" data-diff="easy">Easy</button>
+      <button class="diff-btn" data-diff="medium">Medium</button>
+      <button class="diff-btn" data-diff="hard">Hard</button>
+    </div>
+    <button class="new-game-btn" id="newGameBtn">🔄 New Game</button>
+    <button class="icon-btn" id="soundBtn" title="Toggle sound">🔊</button>
+  </div>
+
+  <div class="board easy" id="board"></div>
+
+  <footer>Made for endless replaying — every shuffle is a new galaxy.</footer>
+</div>
+
+<div class="overlay" id="winOverlay">
+  <div class="win-panel">
+    <div class="win-emoji">🎉</div>
+    <h2>Galaxy Cleared!</h2>
+    <div class="stars" id="winStars">⭐⭐⭐</div>
+    <div class="win-stats">
+      <div class="win-stat"><span class="n" id="winScore">0</span><span class="l">Score</span></div>
+      <div class="win-stat"><span class="n" id="winTime">00:00</span><span class="l">Time</span></div>
+      <div class="win-stat"><span class="n" id="winMoves">0</span><span class="l">Moves</span></div>
+    </div>
+    <button class="new-game-btn" id="playAgainBtn">✨ Play Again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- Starfield ----------
+  const starsEl = document.getElementById('stars');
+  const starCount = 70;
+  for(let i=0;i<starCount;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*2.5+1;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*3)+'s';
+    s.style.animationDuration = (2+Math.random()*3)+'s';
+    starsEl.appendChild(s);
+  }
+
+  // ---------- Sound (Web Audio synth, no external files) ----------
+  let audioCtx = null;
+  let soundOn = true;
+  function ctx(){
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function tone(freq, start, dur, type, gain){
+    if(!soundOn) return;
+    const c = ctx();
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = type||'sine';
+    osc.frequency.setValueAtTime(freq, c.currentTime+start);
+    g.gain.setValueAtTime(0, c.currentTime+start);
+    g.gain.linearRampToValueAtTime(gain||0.15, c.currentTime+start+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+start+dur);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(c.currentTime+start);
+    osc.stop(c.currentTime+start+dur+0.05);
+  }
+  function sfxFlip(){ tone(420,0,0.09,'triangle',0.12); }
+  function sfxMatch(){ tone(523,0,0.12,'sine',0.18); tone(659,0.09,0.14,'sine',0.18); tone(784,0.18,0.22,'sine',0.2); }
+  function sfxMismatch(){ tone(220,0,0.16,'sawtooth',0.1); tone(160,0.1,0.2,'sawtooth',0.1); }
+  function sfxWin(){
+    const notes=[523,587,659,784,880,1046];
+    notes.forEach((f,i)=> tone(f,i*0.12,0.28,'sine',0.16));
+  }
+
+  // ---------- Confetti ----------
+  const canvas = document.getElementById('confetti');
+  const cctx = canvas.getContext('2d');
+  function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  let confettiParticles = [];
+  const confettiColors = ['#FF3D77','#FFD23F','#2EE6D6','#6C4CE0','#FFF8F0'];
+  function launchConfetti(){
+    confettiParticles = [];
+    for(let i=0;i<140;i++){
+      confettiParticles.push({
+        x: canvas.width/2 + (Math.random()-0.5)*200,
+        y: canvas.height*0.35 + (Math.random()-0.5)*60,
+        vx: (Math.random()-0.5)*9,
+        vy: Math.random()*-9-3,
+        size: Math.random()*7+4,
+        color: confettiColors[Math.floor(Math.random()*confettiColors.length)],
+        rot: Math.random()*360,
+        vrot: (Math.random()-0.5)*14,
+        shape: Math.random()>0.5?'rect':'circle',
+        life: 0
+      });
+    }
+    requestAnimationFrame(animateConfetti);
+  }
+  function animateConfetti(){
+    cctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    confettiParticles.forEach(p=>{
+      p.vy += 0.22;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.life++;
+      if(p.y < canvas.height+20) alive=true;
+      cctx.save();
+      cctx.translate(p.x,p.y);
+      cctx.rotate(p.rot*Math.PI/180);
+      cctx.fillStyle = p.color;
+      cctx.globalAlpha = Math.max(0, 1 - p.life/160);
+      if(p.shape==='rect'){ cctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6); }
+      else { cctx.beginPath(); cctx.arc(0,0,p.size/2,0,Math.PI*2); cctx.fill(); }
+      cctx.restore();
+    });
+    if(alive) requestAnimationFrame(animateConfetti);
+    else cctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+
+  // ---------- Game setup ----------
+  const ICONS = ['🚀','🛸','👽','🪐','🌙','⭐','☄️','🌌','🔭','🎇','🛰️','🌠','🌞','🧑‍🚀','🌚','🌈'];
+  const DIFFS = {
+    easy:   {cols:4, rows:3, cls:'easy'},
+    medium: {cols:4, rows:4, cls:'medium'},
+    hard:   {cols:6, rows:4, cls:'hard'}
+  };
+
+  const boardEl = document.getElementById('board');
+  const scoreVal = document.getElementById('scoreVal');
+  const timerVal = document.getElementById('timerVal');
+  const movesVal = document.getElementById('movesVal');
+  const pairsVal = document.getElementById('pairsVal');
+  const mascot = document.getElementById('mascot');
+  const winOverlay = document.getElementById('winOverlay');
+
+  let currentDiff = 'easy';
+  let cards = [];
+  let flipped = [];
+  let matchedCount = 0;
+  let totalPairs = 6;
+  let moves = 0;
+  let score = 0;
+  let streak = 0;
+  let timerInterval = null;
+  let elapsed = 0;
+  let gameLocked = false;
+  let started = false;
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  function formatTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return m+':'+sec;
+  }
+
+  function startTimer(){
+    stopTimer();
+    elapsed = 0;
+    timerVal.textContent = formatTime(0);
+    timerInterval = setInterval(()=>{
+      elapsed++;
+      timerVal.textContent = formatTime(elapsed);
+    },1000);
+  }
+  function stopTimer(){
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function setMascot(state){
+    const map = {idle:'🌟', happy:'😄', excited:'🤩', oops:'😯'};
+    mascot.textContent = map[state]||'🌟';
+  }
+
+  function buildBoard(diffKey){
+    currentDiff = diffKey;
+    const conf = DIFFS[diffKey];
+    totalPairs = (conf.cols*conf.rows)/2;
+    boardEl.className = 'board '+conf.cls;
+    boardEl.innerHTML = '';
+
+    const chosenIcons = shuffle(ICONS.slice()).slice(0, totalPairs);
+    let deck = shuffle(chosenIcons.concat(chosenIcons));
+
+    cards = [];
+    flipped = [];
+    matchedCount = 0;
+    moves = 0;
+    score = 0;
+    streak = 0;
+    gameLocked = false;
+    started = false;
+    scoreVal.textContent = 0;
+    movesVal.textContent = 0;
+    pairsVal.textContent = `0/${totalPairs}`;
+    setMascot('idle');
+    stopTimer();
+    timerVal.textContent = '00:00';
+
+    deck.forEach((icon, idx)=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = (idx*0.03)+'s';
+      card.dataset.icon = icon;
+      card.dataset.index = idx;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-back"></div>
+          <div class="card-face card-front">${icon}</div>
+        </div>`;
+      card.addEventListener('click', ()=> onCardClick(card));
+      boardEl.appendChild(card);
+      cards.push(card);
+    });
+  }
+
+  function onCardClick(card){
+    if(gameLocked) return;
+    if(card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    if(flipped.length>=2) return;
+
+    if(!started){ started = true; startTimer(); }
+
+    sfxFlip();
+    card.classList.add('flipped');
+    flipped.push(card);
+
+    if(flipped.length===2){
+      moves++;
+      movesVal.textContent = moves;
+      gameLocked = true;
+      const [a,b] = flipped;
+      if(a.dataset.icon === b.dataset.icon){
+        setTimeout(()=>{
+          a.classList.add('matched'); b.classList.add('matched');
+          sfxMatch();
+          matchedCount++;
+          streak++;
+          score += 100 + (streak-1)*20;
+          scoreVal.textContent = score;
+          pairsVal.textContent = `${matchedCount}/${totalPairs}`;
+          setMascot('excited');
+          flipped = [];
+          gameLocked = false;
+          if(matchedCount === totalPairs){
+            onWin();
+          }
+        }, 380);
+      } else {
+        streak = 0;
+        score = Math.max(0, score-5);
+        scoreVal.textContent = score;
+        setMascot('oops');
+        a.classList.add('shake'); b.classList.add('shake');
+        setTimeout(()=>{
+          a.classList.remove('flipped'); b.classList.remove('flipped');
+          a.classList.remove('shake'); b.classList.remove('shake');
+          sfxMismatch();
+          flipped = [];
+          gameLocked = false;
+          setMascot('idle');
+        }, 700);
+      }
+    }
+  }
+
+  function starsForMoves(){
+    const ratio = moves / totalPairs;
+    if(ratio <= 1.3) return 3;
+    if(ratio <= 2.0) return 2;
+    return 1;
+  }
+
+  function onWin(){
+    stopTimer();
+    setMascot('excited');
+    sfxWin();
+    launchConfetti();
+    document.getElementById('winScore').textContent = score;
+    document.getElementById('winTime').textContent = formatTime(elapsed);
+    document.getElementById('winMoves').textContent = moves;
+    const n = starsForMoves();
+    document.getElementById('winStars').textContent = '⭐'.repeat(n) + '☆'.repeat(3-n);
+    setTimeout(()=> winOverlay.classList.add('show'), 250);
+  }
+
+  // ---------- Controls ----------
+  document.getElementById('diffGroup').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.diff-btn');
+    if(!btn) return;
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    buildBoard(btn.dataset.diff);
+  });
+
+  document.getElementById('newGameBtn').addEventListener('click', ()=> buildBoard(currentDiff));
+  document.getElementById('playAgainBtn').addEventListener('click', ()=>{
+    winOverlay.classList.remove('show');
+    buildBoard(currentDiff);
+  });
+
+  document.getElementById('soundBtn').addEventListener('click', (e)=>{
+    soundOn = !soundOn;
+    e.target.textContent = soundOn ? '🔊' : '🔇';
+  });
+
+  // init
+  buildBoard('easy');
+})();
+</script>
+</body>
+</html>
