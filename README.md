@@ -1,4 +1,4 @@
-# 🌌 Cosmic Match — Memory Game
+# 🌌 Cosmic Match - Memory Game
 
 A fast, colorful memory-matching game built with plain HTML, CSS, and JavaScript — no frameworks, no build step, no dependencies. Flip cards, find pairs, rack up streak bonuses, and clear the galaxy!
 
