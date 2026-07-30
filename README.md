@@ -5,7 +5,7 @@ A fast, colorful memory-matching game built with plain HTML, CSS, and JavaScript
 
 ## ✨ Features
 
-- **3 difficulty levels** — Easy (4×3), Medium (4×4), Hard (6×4)
+- **3 difficulty levels** - Easy (4×3), Medium (4×4), Hard (6×4)
 - **Live scoring** with streak bonuses for back-to-back matches
 - **Timer** that tracks how fast you clear the board
 - **Move counter** to measure efficiency
@@ -14,7 +14,7 @@ A fast, colorful memory-matching game built with plain HTML, CSS, and JavaScript
 - **Synthesized sound effects** (flip, match, mismatch, win fanfare) generated live with the Web Audio API — no audio files to load
 - **Confetti celebration** when you clear all the pairs
 - **A bouncy mascot** that reacts to matches and misses
-- Fully responsive — works on desktop and mobile
+- Fully responsive - works on desktop and mobile
 - Mute/unmute toggle for sound
 
 ## 🎮 How to play
@@ -22,7 +22,7 @@ A fast, colorful memory-matching game built with plain HTML, CSS, and JavaScript
 1. Click any two cards to flip them over.
 2. If they match, they stay face-up and you score points.
 3. If they don't match, they flip back after a moment.
-4. Find all the pairs before you run out of patience — the faster and more accurate you are, the higher your score and star rating!
+4. Find all the pairs before you run out of patience! The faster and more accurate you are, the higher your score and star rating!
 
 ## 🚀 Getting started
 
@@ -49,11 +49,11 @@ Or drag `index.html` straight into any browser tab.
 - **Vanilla JavaScript** for game logic, timer, scoring, and a hand-rolled confetti particle system
 - **Web Audio API** for all sound effects (synthesized in-browser, no audio assets)
 
-Everything lives in a single self-contained file — easy to drop into any static site or GitHub Pages.
+Everything lives in a single self-contained file - easy to drop into any static site or GitHub Pages.
 
 ## 📄 License
 
-MIT — free to use, modify, and share.
+MIT - free to use, modify, and share.
 
 ## 🙌 Contributing
 
