@@ -230,7 +230,7 @@
     transform:translateY(-4px) scale(1.03);
   }
   .card.locked{pointer-events:none;}
-
+  
   /* Win modal */
   .overlay{
     position:fixed; inset:0; z-index:20;
@@ -327,7 +327,7 @@
 
 <script>
 (function(){
-  // ---------- Starfield ----------
+  // ------ Starfield ------
   const starsEl = document.getElementById('stars');
   const starCount = 70;
   for(let i=0;i<starCount;i++){
@@ -343,7 +343,7 @@
     starsEl.appendChild(s);
   }
 
-  // ---------- Sound (Web Audio synth, no external files) ----------
+  //----- Sound (Web Audio synth, no external files) -----
   let audioCtx = null;
   let soundOn = true;
   function ctx(){
@@ -372,7 +372,7 @@
     notes.forEach((f,i)=> tone(f,i*0.12,0.28,'sine',0.16));
   }
 
-  // ---------- Confetti ----------
+  //----- Confetti -----
   const canvas = document.getElementById('confetti');
   const cctx = canvas.getContext('2d');
   function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
@@ -418,7 +418,7 @@
     else cctx.clearRect(0,0,canvas.width,canvas.height);
   }
 
-  // ---------- Game setup ----------
+  // ----- Game setup -----
   const ICONS = ['🚀','🛸','👽','🪐','🌙','⭐','☄️','🌌','🔭','🎇','🛰️','🌠','🌞','🧑‍🚀','🌚','🌈'];
   const DIFFS = {
     easy:   {cols:4, rows:3, cls:'easy'},
@@ -592,7 +592,7 @@
     setTimeout(()=> winOverlay.classList.add('show'), 250);
   }
 
-  // ---------- Controls ----------
+  // ---- Controls ----
   document.getElementById('diffGroup').addEventListener('click', (e)=>{
     const btn = e.target.closest('.diff-btn');
     if(!btn) return;
